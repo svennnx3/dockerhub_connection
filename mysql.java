@@ -40,7 +40,7 @@ public class mysql {
 				System.out.println(Integer.toString(i)+" "+fn+" "+ln);
 			}
 		}catch (SQLException e) {
-				System.out.println("Blad dzialania");
+				System.out.println("Cos poszlo nie tak");
 				e.printStackTrace();
 		}
 	}
@@ -53,8 +53,8 @@ public class mysql {
 					"firstname VARCHAR(30),"+
 					"lastname VARCHAR(30)"+
 					")");
-				statement.executeUpdate("INSERT IGNORE INTO users (id,firstname,lastname) VALUES (1,'Jan', 'Kowalski'),"+
-					"(2,'Adam', 'Nowak'),(3,'Krzysztof', 'Drzazga')");
+				statement.executeUpdate("INSERT IGNORE INTO users (id,firstname,lastname) VALUES (1,'Michal', 'Chodorowski'),"+
+					"(2,'Wojciech', 'Szczesny'),(3,'Franek', 'Kimono')");
 				ResultSet result = statement.executeQuery("SELECT * FROM users");
 				while(result.next()){
 					int i = result.getInt("id");
