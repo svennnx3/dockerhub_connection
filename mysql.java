@@ -1,63 +1,75 @@
 import java.sql.*;
-import java.util.Scanner;
 
-class MyClass {
-    public static void main(String args[]) {
+public class mysql {
+	private static Connection conn;
+	private static Statement statement;
+	public static void main(String[] args){
+		try{
+			conn = DriverManager.getConnection("jdbc:mysql://10.0.10.3:3306/my_database","mchodorowski","pass");
+			statement = conn.createStatement();
+			switch (args[0]){
+				case "insert":
+					mysql.insert(args);
+					break;
+				case "select":
+					mysql.show();
+					break;
+				case "init":
+					mysql.init();
+					break;
+			}
+		} catch (Exception e){
+			e.printStackTrace();	
+		}
+	}
+	public static void insert(String[] strings){
+		try{
+			statement.executeUpdate("INSERT INTO users(id,firstname,lastname) VALUES ("+strings[1]+",'"+strings[2]+"','"+strings[3]+"')");
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 
-        Statement statement;
-        Connection conn = null;
+	public static void show(){
+		try{
+			ResultSet result = statement.executeQuery("SELECT * FROM users");
+			while(result.next()){
+				int i = result.getInt("id");
+				String fn = result.getString("firstname");
+				String ln = result.getString("lastname");
+				System.out.println(Integer.toString(i)+" "+fn+" "+ln);
+			}
+		}catch (SQLException e) {
+				System.out.println("Blad dzialania");
+				e.printStackTrace();
+		}
+	}
 
-        try {
-
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/mydb", "root", null
-            );
-
-            String ct = "CREATE TABLE IF NOT EXISTS users (username VARCHAR(30), password VARCHAR(30), name VARCHAR(30));";
-
-            statement = conn.createStatement();
-
-            statement.executeUpdate(ct);
-
-            Scanner in = new Scanner(System.in);
-            while(true) {
-                System.out.println("'a' to add, 'p' to print all rows");
-                String choice = in.nextLine();
-                if ("p".equals(choice)) {
-                    statement = conn.createStatement();
-                    String query = "select * from users;";
-                    ResultSet rs = statement.executeQuery(query);
-                    System.out.println("Users:");
-                    while (rs.next()) {
-                        String username = rs.getString("username");
-                        String password = rs.getString("password");
-                        String name = rs.getString("name");
-
-                        System.out.print(username);
-                        System.out.print(", ");
-                        System.out.print(password);
-                        System.out.print(", ");
-                        System.out.println(name);
-                    }
-                }
-                if ("a".equals(choice)) {
-                    System.out.print("Username: ");
-                    String username = in.nextLine();
-                    System.out.print("Password: ");
-                    String password = in.nextLine();
-                    System.out.print("Name: ");
-                    String name = in.nextLine();
-
-                    statement = conn.createStatement();
-
-                    String query = "INSERT INTO users VALUES('"+username+"', '"+password+"', '"+name+"');";
-
-                    statement.executeUpdate(query);
-                }
-            }
-        } catch(Exception e) {
-            System.out.println(e);
-        }
-    }
+	public static void init(){
+		try {
+				Thread.sleep(60000);
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS users ("+
+					"id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,"+
+					"firstname VARCHAR(30),"+
+					"lastname VARCHAR(30)"+
+					")");
+				statement.executeUpdate("INSERT IGNORE INTO users (id,firstname,lastname) VALUES (1,'Jan', 'Kowalski'),"+
+					"(2,'Adam', 'Nowak'),(3,'Krzysztof', 'Drzazga')");
+				ResultSet result = statement.executeQuery("SELECT * FROM users");
+				while(result.next()){
+					int i = result.getInt("id");
+					String fn = result.getString("firstname");
+					String ln = result.getString("lastname");
+					System.out.println(Integer.toString(i)+" "+fn+" "+ln);
+				}
+				conn.close();
+			} catch (SQLException e) {
+				System.out.println("Blad dzialania");
+				e.printStackTrace();
+			} catch (Exception e) {
+				System.out.println("Blad dzialania");
+				e.printStackTrace();
+				
+			}
+	}
 }
